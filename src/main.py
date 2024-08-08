@@ -1,6 +1,6 @@
 import psycopg2
 from db_manager import DBManager
-from config import config
+from conn_db import config
 from utils import create_db, insert_data
 from get_vacancy import get_vacancies_list, get_companies, get_vacancies
 
