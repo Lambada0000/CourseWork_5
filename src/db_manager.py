@@ -3,20 +3,17 @@ import psycopg2
 
 class DBManager:
 
-    def __init__(self, dbname, user, password, host):
+    def __init__(self, dbname, params):
         self.dbname = dbname
-        self.user = user
-        self.password = password
-        self.host = host
-        self.conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host)
+        self.conn = psycopg2.connect(dbname=dbname, **params)
         self.cur = self.conn.cursor()
 
     def get_companies_and_vacancies_count(self):
         """Получает список всех компаний и количество вакансий у каждой компании."""
         query = """
-        SELECT company, 
+        SELECT company_name, 
         COUNT(*) FROM vacancies
-        GROUP BY company
+        GROUP BY company_name
         """
         self.cur.execute(query)
         return {row[0]: row[1] for row in self.cur.fetchall()}
@@ -25,7 +22,7 @@ class DBManager:
         """Получает список всех вакансий с указанием названия компании, названия вакансии и зарплаты и ссылки на
         вакансию."""
         query = """
-        SELECT job_title, company, salary_from, salary_to, link_to_vacancy FROM vacancies
+        SELECT job_title, company_name, salary_from, link_to_vacancy FROM vacancies
         """
         self.cur.execute(query)
         return self.cur.fetchall()
@@ -51,12 +48,8 @@ class DBManager:
     def get_vacancies_with_keyword(self, keyword):
         """Получает список всех вакансий, в названии которых содержатся переданные в метод слова, например python."""
         query = """
-                        SELECT * FROM vacancy_table
+                        SELECT * FROM vacancies
                         WHERE LOWER(job_title) LIKE %s
                         """
         self.cur.execute(query, ('%' + keyword.lower() + '%',))
         return self.cur.fetchall()
-
-    def close_connection(self):
-        self.cur.close()
-        self.conn.close()
