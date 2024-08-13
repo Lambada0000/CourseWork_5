@@ -22,7 +22,9 @@ class DBManager:
         """Получает список всех вакансий с указанием названия компании, названия вакансии и зарплаты и ссылки на
         вакансию."""
         query = """
-        SELECT job_title, company_name, salary_from, link_to_vacancy FROM vacancies
+        SELECT v.job_title, e.company_name, v.salary_from, v.link_to_vacancy
+        FROM vacancies v
+        JOIN employers e ON v.company_id = e.company_id
         """
         self.cur.execute(query)
         return self.cur.fetchall()
